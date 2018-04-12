@@ -77,7 +77,13 @@ defmodule Farmbot.CeleryScript.Runtime.Scheduler do
     # Logger.info 3, "Finished with #{inspect ref} #{inspect runtime_pid}: #{inspect state.awaiting}"
     reply = case reason do
       :normal -> :ok
-      other -> other
+      {%{__exception__: _} = exception, _} ->
+        message = Exception.message(exception)
+        Logger.error 1, "Virtual machine crash: \"#{message}\""
+        {:error, message}
+      other ->
+        Logger.error 1, "Virtual machine crash: #{inspect reason}"
+        other
     end
 
     for from <- state.awaiting[ref] do
