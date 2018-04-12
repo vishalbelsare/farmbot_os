@@ -25,17 +25,9 @@ defmodule Farmbot.CeleryScript.AST do
   defstruct [:kind, :args, :body, :comment]
 
   @doc "Encode a AST back to a map."
-  # def encode(%__MODULE__{kind: mod, args: args, body: body, comment: comment}) do
-  #   case mod.encode_args(args) do
-  #     {:ok, encoded_args} ->
-  #       case encode_body(body) do
-  #         {:ok, encoded_body} ->
-  #           {:ok, %{kind: kind_to_string(mod), args: encoded_args, body: encoded_body, comment: comment}}
-  #         {:error, _} = err -> err
-  #       end
-  #     {:error, _} = err -> err
-  #   end
-  # end
+  def encode(%__MODULE__{kind: _mod, args: _args, body: _body, comment: _comment} = ast) do
+    Map.from_struct(ast)
+  end
 
   def encode(thing) do
     {:error, "#{inspect thing} is not an AST node for encoding."}

@@ -37,6 +37,8 @@ defmodule Farmbot.CeleryScript.AST.Slicer do
     Enum.reduce(keys, heap, fn(key, %Heap{} = heap) ->
       case canonical_node.args[key] do
         %AST{} = another_node ->
+          # Make sure we tag this arg as a link so we know it is a
+          # CeleryScript node later on.
           k = Heap.link <> to_string(key)
           {addr, heap} = allocate(heap, another_node, parent_addr)
           Heap.put(heap, parent_addr, k, addr)

@@ -116,14 +116,10 @@ defmodule Farmbot.System.GPIO do
     end
   end
 
-  def execute(args, body, env) do
-    raise "FIXME"
-  end
-
   defp do_execute(sequence_id, env) do
-    # import Farmbot.CeleryScript.AST.Node.Execute, only: [execute: 3]
+    code = Farmbot.CeleryScript.AST.decode(%{kind: "execute", args: %{sequence_id: sequence_id}})
     try do
-      case execute(%{sequence_id: sequence_id}, [], env) do
+      case Farmbot.CeleryScript.execute(code) do
         {:ok, env} -> env
         {:error, _, env} -> env
       end

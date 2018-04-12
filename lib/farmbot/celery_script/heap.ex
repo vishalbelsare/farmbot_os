@@ -57,7 +57,8 @@ defmodule Farmbot.CeleryScript.Heap do
   @doc "Puts a key/value pair at an arbitrary address on the heap."
   def put(%Heap{} = heap, %Address{} = addr, key, value) do
     block       = heap[addr] || raise "Bad node address: #{inspect addr}"
-    new_block   = Map.put(block, String.to_atom(to_string(key)), value)
+    key = String.to_atom(to_string(key))
+    new_block   = Map.put(block, key, value)
     new_entries = Map.put(heap.entries, addr, new_block)
     %{heap | entries: new_entries}
   end
