@@ -7,11 +7,16 @@ defmodule Farmbot.CeleryScript.Runtime.Instruction do
   alias Runtime.{State, InstructionSet, UndefinedInstructionError}
   use Farmbot.Logger
 
+  @typedoc "Instruction is a special map with args and pointers."
+  @type t :: map
+
   @exeutable_instructions [
     :_if,
     :calibrate,
     :check_updates,
+    :change_ownership,
     :emergency_lock,
+    :emergency_unlock,
     :execute,
     :execute_script,
     :factory_reset,
@@ -22,7 +27,6 @@ defmodule Farmbot.CeleryScript.Runtime.Instruction do
     :move_absolute,
     :move_relative,
     :nothing,
-    :point,
     :power_off,
     :read_pin,
     :read_status,
@@ -44,8 +48,9 @@ defmodule Farmbot.CeleryScript.Runtime.Instruction do
   def apply(%State{} = state, %InstructionSet{} = is, %{__kind: name} = instruction) when name in @exeutable_instructions do
     impl = Map.get(is, name) || raise UndefinedInstructionError, "`#{name}` is not implemented or depreciated."
     case apply(impl, [state, is, instruction]) do
-      %State{} = state -> state
-      {:error, reason, state} when is_binary(reason) -> {:error, reason, state}
+      {:ok, %State{} = state} -> state
+      {{:error, reason}, %State{} = state} when is_binary(reason) -> {:error, reason, state}
+      {{:error, reason}, %State{} = state} -> {:error, inspect(reason), state}
     end
   end
 end
